@@ -1,0 +1,119 @@
+package com.bomb.Character;
+
+import com.bomb.Object.Object;
+import com.bomb.GUI.Game;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Random;
+
+public class Doll extends Enemy implements CanMove{
+    private int dx = 0;
+    private int dy = 0;
+    private int movement = -10;
+    int turn = 0;
+
+    public Doll(int x, int y){
+        this.x = x;
+        this.y = y;
+        image = new ImageIcon(getClass().getResource("/sprites/doll_left1.png")).getImage();
+    }
+    @Override
+    public void drawCharacter(Graphics2D g2) {
+        g2.drawImage(image, x, y, 42, 41, null);
+    }
+
+    @Override
+    public void move() {
+        int tempX = Game.bomber.x - this.x;
+        int tempY = Game.bomber.y - this.y;
+        if(tempX < 0) {
+            dx = -movement;
+        }
+        else if(tempX > 0)  {
+            dx = movement;
+
+        }
+        else dx = 0;
+        if(tempY < 0) dy = -movement;
+        else if(tempY > 0) dy = movement;
+        else dy = 0;
+        this.x += dx;
+        if(this.x + dx < 0 || this.x + 45 + dx > 45*31 || collision()) this.x -=dx;
+        this.y += dy;
+        if(this.x + dx < 0 || this.x + 45 + dx > 45*31 || collision()) this.y -=dy;
+
+    }
+
+    private boolean collision(){
+        for(Object object : Game.listObject){
+            if(getBound().intersects(object.getBound())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isCrossWay(){
+        if(dx == 0){
+            this.x+=1;
+            if(!collision()){
+                this.x-=1;
+                return true;
+            }
+            this.x-=2;
+            if(!collision()){
+                this.x+=1;
+                return true;
+            }
+            this.x+=1;
+        }
+        else if(dy==0){
+            this.y+=1;
+            if(!collision()){
+                this.y-=1;
+                return true;
+            }
+            this.y-=2;
+            if(!collision()){
+                this.y+=1;
+                return true;
+            }
+            this.y+=1;
+        }
+        return false;
+    }
+
+    private void random(){
+        Random random = new Random();
+        int randomInt = random.nextInt(4) + 1;
+        if(randomInt == 1) {
+            dx = 0;
+            dy = -3;
+        }
+        if(randomInt == 2){
+            dx = 0;
+            dy = 3;
+        }
+        if(randomInt == 3){
+            dx = -3;
+            dy = 0;
+        }
+        if(randomInt == 4){
+            dx = 3;
+            dy = 0;
+        }
+    }
+
+    public Rectangle getBound() {
+        return new Rectangle(x, y, 44, 42);
+    }
+
+    public void changeDirection(){
+        if(dx == 0 && dy > 0) this.image = new ImageIcon(getClass().getResource("/sprites/doll_left2.png")).getImage();
+        if(dx == 0 && dy < 0) this.image = new ImageIcon(getClass().getResource("/sprites/doll_left3.png")).getImage();
+        if(dx > 0 && dy == 0) this.image = new ImageIcon(getClass().getResource("/sprites/doll_right1.png")).getImage();
+        if(dx < 0 && dy == 0) this.image = new ImageIcon(getClass().getResource("/sprites/doll_right2.png")).getImage();
+    }
+
+}
